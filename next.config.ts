@@ -1,7 +1,7 @@
-import type { NextConfig } from "next";
-
-const nextConfig: NextConfig = {
-  /* config options here */
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  // comment out or remove middleware matching
+  // middleware: { matcher: ['/dashboard/:path*'] },
 };
 
-export default nextConfig;
+module.exports = nextConfig;
