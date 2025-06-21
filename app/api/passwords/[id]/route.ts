@@ -4,19 +4,20 @@ import { connectDB } from '@/lib/db';
 import PasswordEntry from '@/models/PasswordEntry';
 import { encrypt, decrypt } from '@/lib/crypto';
 
+// PUT /api/passwords/[id]
 export async function PUT(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: { id: string } }
 ) {
   await connectDB();
-  const token = req.cookies.get('token')?.value;
 
+  const token = req.cookies.get('token')?.value;
   if (!token) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
   try {
-    const { userId } = await verifyToken(token); // Make sure this is `await`
+    const { userId } = await verifyToken(token);
     const { website, username, password, note } = await req.json();
 
     if (!website || !username || !password) {
@@ -29,7 +30,7 @@ export async function PUT(
     const encryptedPassword = encrypt(password);
 
     const updated = await PasswordEntry.findOneAndUpdate(
-      { _id: params.id, userId },
+      { _id: context.params.id, userId },
       { website, username, password: encryptedPassword, note },
       { new: true }
     );
@@ -54,13 +55,14 @@ export async function PUT(
   }
 }
 
+// DELETE /api/passwords/[id]
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: { id: string } }
 ) {
   await connectDB();
-  const token = req.cookies.get('token')?.value;
 
+  const token = req.cookies.get('token')?.value;
   if (!token) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
@@ -69,7 +71,7 @@ export async function DELETE(
     const { userId } = await verifyToken(token);
 
     const deleted = await PasswordEntry.findOneAndDelete({
-      _id: params.id,
+      _id: context.params.id,
       userId,
     });
 
