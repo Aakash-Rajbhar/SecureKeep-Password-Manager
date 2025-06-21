@@ -7,7 +7,7 @@ import { encrypt, decrypt } from '@/lib/crypto';
 // PUT /api/passwords/[id]
 export async function PUT(
   req: NextRequest,
-  context: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   await connectDB();
 
@@ -18,6 +18,7 @@ export async function PUT(
 
   try {
     const { userId } = await verifyToken(token);
+    const { id } = await context.params; // Await the params Promise
     const { website, username, password, note } = await req.json();
 
     if (!website || !username || !password) {
@@ -30,7 +31,7 @@ export async function PUT(
     const encryptedPassword = encrypt(password);
 
     const updated = await PasswordEntry.findOneAndUpdate(
-      { _id: context.params.id, userId },
+      { _id: id, userId }, // Use the awaited id
       { website, username, password: encryptedPassword, note },
       { new: true }
     );
@@ -58,7 +59,7 @@ export async function PUT(
 // DELETE /api/passwords/[id]
 export async function DELETE(
   req: NextRequest,
-  context: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   await connectDB();
 
@@ -69,9 +70,10 @@ export async function DELETE(
 
   try {
     const { userId } = await verifyToken(token);
+    const { id } = await context.params; // Await the params Promise
 
     const deleted = await PasswordEntry.findOneAndDelete({
-      _id: context.params.id,
+      _id: id, // Use the awaited id
       userId,
     });
 
