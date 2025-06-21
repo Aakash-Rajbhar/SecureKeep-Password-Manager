@@ -8,7 +8,7 @@ import { verifyToken } from '@/lib/jwt';
 
 export async function POST(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   await connectDB();
 
@@ -22,7 +22,9 @@ export async function POST(
     if (!userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
-    const entry = await PasswordEntry.findOne({ _id: params.id, userId });
+
+    const { id } = await context.params;
+    const entry = await PasswordEntry.findOne({ _id: id, userId });
 
     if (!entry) {
       return NextResponse.json({ error: 'Not found' }, { status: 404 });
