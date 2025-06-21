@@ -5,10 +5,11 @@ import { motion } from 'framer-motion';
 
 import AddEntryForm from '@/components/dashboard/AddEntryForm';
 import PasswordTable from '@/components/dashboard/PasswordTable';
-import LoadingState from '@/components/dashboard/LoadingState';
+// import LoadingState from '@/components/dashboard/LoadingState';
 import EmptyState from '@/components/dashboard/EmptyState';
 import Header from '@/components/dashboard/Header';
 import SearchBar from '@/components/dashboard/SearchBar';
+import PasswordTableSkeleton from '@/components/dashboard/PasswordTableSkeleton';
 
 interface Entry {
   _id?: string;
@@ -51,7 +52,7 @@ export default function DashboardPage() {
   useEffect(() => {
     const fetchEntries = async () => {
       try {
-        const res = await fetch('/api/passwords');
+        const res = await fetch('/api/passwords?_=${Date.now()}');
         if (!res.ok) throw new Error('Failed to fetch passwords');
         const data = await res.json();
         setEntries(
@@ -66,6 +67,20 @@ export default function DashboardPage() {
 
     fetchEntries();
   }, []);
+
+  const fetchEntries = async () => {
+    setLoading(true);
+    try {
+      const res = await fetch('/api/passwords?_=${Date.now()}');
+      if (!res.ok) throw new Error('Failed to fetch passwords');
+      const data = await res.json();
+      setEntries(data.map((entry: Entry) => ({ ...entry, isEditing: false })));
+    } catch (error) {
+      alert(error instanceof Error ? error.message : 'An error occurred');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const togglePasswordVisibility = async (id: string) => {
     setVisiblePasswords((prev) => ({ ...prev, [id]: !prev[id] }));
@@ -96,14 +111,6 @@ export default function DashboardPage() {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleEditChange = (id: string, field: string, value: string) => {
-    setEntries((prev) =>
-      prev.map((entry) =>
-        entry._id === id ? { ...entry, [field]: value } : entry
-      )
-    );
-  };
-
   const addPassword = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
@@ -116,6 +123,7 @@ export default function DashboardPage() {
       if (!res.ok) throw new Error('Failed to save');
       const newEntry = await res.json();
       setEntries([{ ...newEntry, isEditing: false }, ...entries]);
+      await fetchEntries(); // Refresh entries
       setForm({ website: '', username: '', password: '', showPassword: false });
     } catch (error) {
       alert(error instanceof Error ? error.message : 'Failed to save');
@@ -138,21 +146,39 @@ export default function DashboardPage() {
 
   const saveEntry = async (id: string, updatedData: Partial<Entry>) => {
     try {
+      const entryToUpdate = entries.find((entry) => entry._id === id);
+      if (!entryToUpdate) return;
+
       const res = await fetch(`/api/passwords/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(updatedData),
         credentials: 'include',
       });
-      if (!res.ok) throw new Error('Failed to update');
-      const updatedEntry = await res.json();
-      setEntries((prev) =>
-        prev.map((entry) =>
-          entry._id === id ? { ...entry, ...updatedEntry } : entry
-        )
-      );
+
+      if (!res.ok) {
+        const error = await res.json();
+        throw new Error(error.message || 'Failed to update password');
+      }
+
+      // 🧠 1. Clear any old decrypted password
+      setDecryptedPasswords((prev) => {
+        const copy = { ...prev };
+        delete copy[id];
+        return copy;
+      });
+
+      // 🧠 2. Hide password after update
+      setVisiblePasswords((prev) => ({
+        ...prev,
+        [id]: false,
+      }));
+
+      // 🧠 3. Refresh the list
+      await fetchEntries();
     } catch (error) {
       console.error('Update failed:', error);
+      throw error;
     }
   };
 
@@ -238,7 +264,7 @@ export default function DashboardPage() {
             />
           </div>
 
-          <div className="w-full sm:w-auto flex sm:flex-col gap-4 items-end">
+          <div className="w-full sm:w-auto flex sm:flex-col gap-4 sm:gap-2 items-end">
             <p className="text-sm font-medium text-gray-500 mb-2">
               Export data
             </p>
@@ -269,7 +295,7 @@ export default function DashboardPage() {
 
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
           {loading ? (
-            <LoadingState />
+            <PasswordTableSkeleton />
           ) : filteredEntries.length === 0 ? (
             <EmptyState searchTerm={searchTerm} />
           ) : (
@@ -282,7 +308,7 @@ export default function DashboardPage() {
               copyToClipboard={copyToClipboard}
               deleteEntry={deleteEntry}
               saveEntry={saveEntry}
-              handleEditChange={handleEditChange}
+              fetchEntries={fetchEntries}
             />
           )}
         </div>
