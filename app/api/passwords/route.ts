@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { verifyToken } from '@/lib/jwt';
 import { connectDB } from '@/lib/db';
 import PasswordEntry from '@/models/PasswordEntry';
-import { encrypt, decrypt } from '@/lib/crypto';
+import { encrypt } from '@/lib/crypto';
 
 export async function POST(req: NextRequest) {
   await connectDB();
@@ -26,7 +26,6 @@ export async function POST(req: NextRequest) {
     });
 
     const entryObj = newEntry.toObject();
-    entryObj.password = decrypt(entryObj.password);
     return NextResponse.json(entryObj);
   } catch {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -43,7 +42,6 @@ export async function GET(req: NextRequest) {
 
     const decryptedEntries = entries.map((entry) => ({
       ...entry.toObject(),
-      password: decrypt(entry.password),
     }));
 
     return NextResponse.json(decryptedEntries);

@@ -23,9 +23,14 @@ export default function DashboardPage() {
   const [entries, setEntries] = useState<Entry[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
+  const [decryptingPasswords, setDecryptingPasswords] = useState<string[]>([]);
+  const [decryptedPasswords, setDecryptedPasswords] = useState<{
+    [key: string]: string;
+  }>({});
   const [visiblePasswords, setVisiblePasswords] = useState<{
     [key: string]: boolean;
   }>({});
+
   const [form, setForm] = useState<Entry>({
     website: '',
     username: '',
@@ -62,8 +67,24 @@ export default function DashboardPage() {
     fetchEntries();
   }, []);
 
-  const togglePasswordVisibility = (id: string) => {
+  const togglePasswordVisibility = async (id: string) => {
     setVisiblePasswords((prev) => ({ ...prev, [id]: !prev[id] }));
+
+    if (!decryptedPasswords[id]) {
+      try {
+        setDecryptingPasswords((prev) => [...prev, id]);
+        const res = await fetch(`/api/passwords/${id}/decrypt`, {
+          method: 'POST',
+          credentials: 'include',
+        });
+        const data = await res.json();
+        setDecryptedPasswords((prev) => ({ ...prev, [id]: data.password }));
+      } catch (error) {
+        console.error('Failed to decrypt password', error);
+      } finally {
+        setDecryptingPasswords((prev) => prev.filter((pid) => pid !== id));
+      }
+    }
   };
 
   const copyToClipboard = (text: string) => {
@@ -76,8 +97,8 @@ export default function DashboardPage() {
   };
 
   const handleEditChange = (id: string, field: string, value: string) => {
-    setEntries(
-      entries.map((entry) =>
+    setEntries((prev) =>
+      prev.map((entry) =>
         entry._id === id ? { ...entry, [field]: value } : entry
       )
     );
@@ -103,16 +124,13 @@ export default function DashboardPage() {
 
   const deleteEntry = async (id: string) => {
     if (!confirm('Are you sure you want to delete this entry?')) return;
-
     try {
       const res = await fetch(`/api/passwords/${id}`, {
         method: 'DELETE',
         credentials: 'include',
       });
-
       if (!res.ok) throw new Error('Failed to delete');
-
-      setEntries(entries.filter((entry) => entry._id !== id));
+      setEntries((prev) => prev.filter((entry) => entry._id !== id));
     } catch (error) {
       alert(error instanceof Error ? error.message : 'Failed to delete');
     }
@@ -120,27 +138,14 @@ export default function DashboardPage() {
 
   const saveEntry = async (id: string, updatedData: Partial<Entry>) => {
     try {
-      const entryToUpdate = entries.find((entry) => entry._id === id);
-      if (!entryToUpdate) return;
-
       const res = await fetch(`/api/passwords/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          website: updatedData.website,
-          username: updatedData.username,
-          password: updatedData.password,
-        }),
+        body: JSON.stringify(updatedData),
         credentials: 'include',
       });
-
-      if (!res.ok) {
-        const error = await res.json();
-        throw new Error(error.message || 'Failed to update password');
-      }
-
+      if (!res.ok) throw new Error('Failed to update');
       const updatedEntry = await res.json();
-
       setEntries((prev) =>
         prev.map((entry) =>
           entry._id === id ? { ...entry, ...updatedEntry } : entry
@@ -148,34 +153,52 @@ export default function DashboardPage() {
       );
     } catch (error) {
       console.error('Update failed:', error);
-      throw error;
     }
   };
 
-  const exportToCSV = () => {
-    if (!confirm('This will export all passwords in plain text. Continue?')) {
+  const exportToCSV = async () => {
+    if (!confirm('This will export all passwords in plain text. Continue?'))
       return;
+
+    const decryptedMap: { [key: string]: string } = {};
+
+    for (const entry of entries) {
+      const id = entry._id!;
+      if (decryptedPasswords[id]) {
+        decryptedMap[id] = decryptedPasswords[id];
+      } else {
+        try {
+          const res = await fetch(`/api/passwords/${id}/decrypt`, {
+            method: 'POST',
+            credentials: 'include',
+          });
+          const data = await res.json();
+          decryptedMap[id] = data.password;
+        } catch {
+          console.error(`Failed to decrypt ${id}`);
+          decryptedMap[id] = 'DECRYPTION_FAILED';
+        }
+      }
     }
-    // Create CSV content
+
     const headers = ['Website', 'Username', 'Password'];
     const csvRows = [
-      headers.join(','), // Header row
+      headers.join(','),
       ...entries.map(
-        (entry) => `"${entry.website}","${entry.username}","${entry.password}"`
+        (entry) =>
+          `"${entry.website}","${entry.username}","${
+            decryptedMap[entry._id!] || 'UNKNOWN'
+          }"`
       ),
     ];
 
-    const csvContent = csvRows.join('\n');
-
-    // Create download link
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const blob = new Blob([csvRows.join('\n')], {
+      type: 'text/csv;charset=utf-8;',
+    });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.setAttribute('href', url);
     link.setAttribute('download', 'passwords_export.csv');
-    link.style.visibility = 'hidden';
-
-    // Trigger download
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -183,16 +206,13 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 text-gray-900 px-4 sm:px-6 lg:px-8 py-6">
-      {/* Modern subtle grid background */}
       <div className="fixed inset-0 pointer-events-none">
         <div className="absolute inset-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px] opacity-20"></div>
       </div>
 
-      {/* Main content container with max-width */}
       <div className="max-w-6xl mx-auto relative">
         <Header />
 
-        {/* Add entry form section */}
         <div className="mb-8">
           <AddEntryForm
             form={form}
@@ -201,7 +221,6 @@ export default function DashboardPage() {
           />
         </div>
 
-        {/* Search and export section */}
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
@@ -248,7 +267,6 @@ export default function DashboardPage() {
           </div>
         </motion.div>
 
-        {/* Content area */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
           {loading ? (
             <LoadingState />
@@ -258,6 +276,8 @@ export default function DashboardPage() {
             <PasswordTable
               filteredEntries={filteredEntries}
               visiblePasswords={visiblePasswords}
+              decryptedPasswords={decryptedPasswords}
+              decryptingPasswords={decryptingPasswords}
               togglePasswordVisibility={togglePasswordVisibility}
               copyToClipboard={copyToClipboard}
               deleteEntry={deleteEntry}
