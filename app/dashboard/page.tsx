@@ -1,12 +1,14 @@
 'use client';
 
 import { useEffect, useState, useMemo } from 'react';
-import { useRouter } from 'next/navigation';
-import SearchHeader from '@/components/dashboard/SearchHeader';
+import { motion } from 'framer-motion';
+
 import AddEntryForm from '@/components/dashboard/AddEntryForm';
 import PasswordTable from '@/components/dashboard/PasswordTable';
 import LoadingState from '@/components/dashboard/LoadingState';
 import EmptyState from '@/components/dashboard/EmptyState';
+import Header from '@/components/dashboard/Header';
+import SearchBar from '@/components/dashboard/SearchBar';
 
 interface Entry {
   _id?: string;
@@ -30,7 +32,6 @@ export default function DashboardPage() {
     password: '',
     showPassword: false,
   });
-  const router = useRouter();
 
   const filteredEntries = useMemo(() => {
     if (!searchTerm.trim()) return entries;
@@ -68,11 +69,6 @@ export default function DashboardPage() {
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
     alert('Copied to clipboard');
-  };
-
-  const logout = () => {
-    document.cookie = 'token=; Max-Age=0';
-    router.push('/login');
   };
 
   const handleFormChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -135,7 +131,7 @@ export default function DashboardPage() {
           username: updatedData.username,
           password: updatedData.password,
         }),
-        credentials: 'include', // If using cookies
+        credentials: 'include',
       });
 
       if (!res.ok) {
@@ -145,7 +141,6 @@ export default function DashboardPage() {
 
       const updatedEntry = await res.json();
 
-      // Update local state
       setEntries((prev) =>
         prev.map((entry) =>
           entry._id === id ? { ...entry, ...updatedEntry } : entry
@@ -153,58 +148,125 @@ export default function DashboardPage() {
       );
     } catch (error) {
       console.error('Update failed:', error);
-      // Show error to user
-      throw error; // Re-throw to be caught by PasswordTable
+      throw error;
     }
   };
 
+  const exportToCSV = () => {
+    if (!confirm('This will export all passwords in plain text. Continue?')) {
+      return;
+    }
+    // Create CSV content
+    const headers = ['Website', 'Username', 'Password'];
+    const csvRows = [
+      headers.join(','), // Header row
+      ...entries.map(
+        (entry) => `"${entry.website}","${entry.username}","${entry.password}"`
+      ),
+    ];
+
+    const csvContent = csvRows.join('\n');
+
+    // Create download link
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.setAttribute('href', url);
+    link.setAttribute('download', 'passwords_export.csv');
+    link.style.visibility = 'hidden';
+
+    // Trigger download
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-blue-50 text-gray-900 p-4 sm:p-8 relative overflow-hidden">
-      <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-1/4 left-1/4 w-64 h-64 rounded-full bg-purple-200/30 blur-3xl animate-float"></div>
-        <div className="absolute bottom-1/3 right-1/4 w-80 h-80 rounded-full bg-blue-200/30 blur-3xl animate-float-delay"></div>
-      </div>
-
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 text-gray-900 px-4 sm:px-6 lg:px-8 py-6">
+      {/* Modern subtle grid background */}
       <div className="fixed inset-0 pointer-events-none">
-        <div
-          className="absolute inset-0 opacity-10"
-          style={{
-            backgroundImage: `
-              linear-gradient(to right, #ddd 1px, transparent 1px),
-              linear-gradient(to bottom, #ddd 1px, transparent 1px)
-            `,
-            backgroundSize: '40px 40px',
-          }}
-        ></div>
+        <div className="absolute inset-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px] opacity-20"></div>
       </div>
 
-      <SearchHeader
-        searchTerm={searchTerm}
-        setSearchTerm={setSearchTerm}
-        logout={logout}
-      />
+      {/* Main content container with max-width */}
+      <div className="max-w-6xl mx-auto relative">
+        <Header />
 
-      <AddEntryForm
-        form={form}
-        handleFormChange={handleFormChange}
-        addPassword={addPassword}
-      />
+        {/* Add entry form section */}
+        <div className="mb-8">
+          <AddEntryForm
+            form={form}
+            handleFormChange={handleFormChange}
+            addPassword={addPassword}
+          />
+        </div>
 
-      {loading ? (
-        <LoadingState />
-      ) : filteredEntries.length === 0 ? (
-        <EmptyState searchTerm={searchTerm} />
-      ) : (
-        <PasswordTable
-          filteredEntries={filteredEntries}
-          visiblePasswords={visiblePasswords}
-          togglePasswordVisibility={togglePasswordVisibility}
-          copyToClipboard={copyToClipboard}
-          deleteEntry={deleteEntry}
-          saveEntry={saveEntry}
-          handleEditChange={handleEditChange}
-        />
-      )}
+        {/* Search and export section */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3 }}
+          className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4 mb-6 p-5 bg-white rounded-lg shadow-sm border border-gray-100"
+        >
+          <div className="w-full sm:w-auto">
+            <h2 className="text-sm font-medium text-gray-500 mb-2">
+              Search passwords
+            </h2>
+            <SearchBar
+              searchTerm={searchTerm}
+              setSearchTerm={setSearchTerm}
+              className="w-full sm:w-80"
+            />
+          </div>
+
+          <div className="w-full sm:w-auto flex sm:flex-col gap-4 items-end">
+            <p className="text-sm font-medium text-gray-500 mb-2">
+              Export data
+            </p>
+            <button
+              onClick={exportToCSV}
+              className="flex items-center gap-2 px-4 py-2 bg-[#16A34A] border border-gray-200 rounded-lg hover:bg-gray-50 hover:text-[#16A34A] hover:border-[#16A34A] transition-colors text-white text-sm font-medium shadow-xs hover:shadow-sm cursor-pointer"
+              title="Export all passwords as CSV file."
+              aria-label="Export passwords to CSV"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-4 w-4"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={2}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                />
+              </svg>
+              Export CSV
+            </button>
+          </div>
+        </motion.div>
+
+        {/* Content area */}
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+          {loading ? (
+            <LoadingState />
+          ) : filteredEntries.length === 0 ? (
+            <EmptyState searchTerm={searchTerm} />
+          ) : (
+            <PasswordTable
+              filteredEntries={filteredEntries}
+              visiblePasswords={visiblePasswords}
+              togglePasswordVisibility={togglePasswordVisibility}
+              copyToClipboard={copyToClipboard}
+              deleteEntry={deleteEntry}
+              saveEntry={saveEntry}
+              handleEditChange={handleEditChange}
+            />
+          )}
+        </div>
+      </div>
     </div>
   );
 }

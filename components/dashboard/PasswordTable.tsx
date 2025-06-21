@@ -65,21 +65,24 @@ export default function PasswordTable({
   };
 
   return (
-    <div className="bg-white/30 backdrop-blur-md border border-white/20 rounded-2xl p-6 shadow-xl">
+    <div className="bg-white/30 backdrop-blur-md border border-white/20 rounded-lg p-4 md:p-6 shadow-xl">
+      <h3 className="text-neutral-600 text-lg mb-4 md:mb-6 font-semibold">
+        Saved Passwords
+      </h3>
       <div className="overflow-x-auto">
         <table className="min-w-full text-sm table-auto">
-          <thead className="bg-gradient-to-r from-indigo-100 to-purple-100 text-gray-700">
+          <thead className="bg-gradient-to-r from-indigo-100 to-purple-100 text-gray-700 hidden md:table-header-group">
             <tr>
-              <th className="px-4 py-3 text-left font-semibold w-1/4">
+              <th className="px-4 py-3 text-left font-semibold md:w-1/4">
                 Website
               </th>
-              <th className="px-4 py-3 text-left font-semibold w-1/4">
+              <th className="px-4 py-3 text-left font-semibold md:w-1/4">
                 Username
               </th>
-              <th className="px-4 py-3 text-left font-semibold w-1/3">
+              <th className="px-4 py-3 text-left font-semibold md:w-1/3">
                 Password
               </th>
-              <th className="px-4 py-3 text-right font-semibold w-1/6">
+              <th className="px-4 py-3 text-right font-semibold md:w-1/6">
                 Actions
               </th>
             </tr>
@@ -91,9 +94,13 @@ export default function PasswordTable({
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.3 }}
-                className="hover:bg-indigo-50 rounded-lg"
+                className="hover:bg-indigo-50 rounded-lg block md:table-row mb-4 md:mb-0"
               >
-                <td className="px-4 py-4">
+                {/* Website Column */}
+                <td className="px-4 py-4 block md:table-cell">
+                  <div className="md:hidden font-semibold text-gray-500 mb-1">
+                    Website
+                  </div>
                   {editingId === entry._id ? (
                     <input
                       value={editedEntry?.website || ''}
@@ -107,14 +114,18 @@ export default function PasswordTable({
                       <div className="h-8 w-8 rounded-full bg-indigo-200 text-indigo-700 flex items-center justify-center font-bold">
                         {entry.website.charAt(0).toUpperCase()}
                       </div>
-                      <span className="font-medium text-gray-800 truncate max-w-[120px]">
+                      <span className="font-medium text-gray-800 truncate max-w-[120px] md:max-w-none">
                         {entry.website}
                       </span>
                     </div>
                   )}
                 </td>
 
-                <td className="px-4 py-4">
+                {/* Username Column */}
+                <td className="px-4 py-4 block md:table-cell">
+                  <div className="md:hidden font-semibold text-gray-500 mb-1">
+                    Username
+                  </div>
                   {editingId === entry._id ? (
                     <input
                       value={editedEntry?.username || ''}
@@ -124,13 +135,17 @@ export default function PasswordTable({
                       className="w-full px-3 py-2 border rounded-md"
                     />
                   ) : (
-                    <span className="text-gray-600 truncate max-w-[140px] block">
+                    <span className="text-gray-600 truncate max-w-[140px] md:max-w-none block">
                       {entry.username}
                     </span>
                   )}
                 </td>
 
-                <td className="px-4 py-4">
+                {/* Password Column */}
+                <td className="px-4 py-4 block md:table-cell">
+                  <div className="md:hidden font-semibold text-gray-500 mb-1">
+                    Password
+                  </div>
                   {editingId === entry._id ? (
                     <div className="relative">
                       <input
@@ -150,17 +165,17 @@ export default function PasswordTable({
                         onClick={() =>
                           togglePasswordVisibility(entry._id ?? '')
                         }
-                        className="absolute right-3 top-2 text-gray-500"
+                        className="absolute right-3 top-3 text-gray-500"
                       >
                         {visiblePasswords[entry._id ?? ''] ? (
-                          <EyeOff size={16} />
+                          <EyeOff size={16} className="cursor-pointer" />
                         ) : (
-                          <Eye size={16} />
+                          <Eye size={16} className="cursor-pointer" />
                         )}
                       </button>
                     </div>
                   ) : (
-                    <div className="flex items-center space-x-6 w-full">
+                    <div className="flex items-center space-x-2 md:space-x-6 w-full">
                       <input
                         type={
                           visiblePasswords[entry._id ?? '']
@@ -171,48 +186,54 @@ export default function PasswordTable({
                         readOnly
                         className="bg-transparent font-mono text-sm w-full truncate"
                       />
-                      <button
-                        onClick={() =>
-                          togglePasswordVisibility(entry._id ?? '')
-                        }
-                        className="text-gray-500 hover:text-indigo-600"
-                      >
-                        {visiblePasswords[entry._id ?? ''] ? (
-                          <EyeOff size={16} className="cursor-pointer" />
-                        ) : (
-                          <Eye size={16} className="cursor-pointer" />
-                        )}
-                      </button>
-                      <button
-                        onClick={() => copyToClipboard(entry.password)}
-                        className="text-gray-500 hover:text-indigo-600"
-                      >
-                        <Copy size={16} className="cursor-pointer" />
-                      </button>
+                      <div className="flex space-x-2">
+                        <button
+                          onClick={() =>
+                            togglePasswordVisibility(entry._id ?? '')
+                          }
+                          className="text-gray-500 hover:text-indigo-600"
+                        >
+                          {visiblePasswords[entry._id ?? ''] ? (
+                            <EyeOff size={16} className="cursor-pointer" />
+                          ) : (
+                            <Eye size={16} className="cursor-pointer" />
+                          )}
+                        </button>
+                        <button
+                          onClick={() => copyToClipboard(entry.password)}
+                          className="text-gray-500 hover:text-indigo-600"
+                        >
+                          <Copy size={16} className="cursor-pointer" />
+                        </button>
+                      </div>
                     </div>
                   )}
                 </td>
 
-                <td className="px-4 py-4 text-right">
+                {/* Actions Column */}
+                <td className="px-4 py-4 block md:table-cell text-left md:text-right">
+                  <div className="md:hidden font-semibold text-gray-500 mb-1">
+                    Actions
+                  </div>
                   {editingId === entry._id ? (
-                    <div className="flex justify-end space-x-2">
+                    <div className="flex justify-start md:justify-end space-x-2">
                       <button
                         onClick={cancelEditing}
                         disabled={isSaving}
-                        className="text-gray-400 hover:text-gray-600"
+                        className="text-gray-400 hover:text-gray-600 cursor-pointer"
                       >
                         <X size={18} />
                       </button>
                       <button
                         onClick={handleSave}
                         disabled={isSaving}
-                        className="text-green-500 hover:text-green-700"
+                        className="text-green-500 hover:text-green-700 cursor-pointer"
                       >
                         {isSaving ? 'Saving...' : <Check size={18} />}
                       </button>
                     </div>
                   ) : (
-                    <div className="flex justify-end space-x-2">
+                    <div className="flex justify-start md:justify-end space-x-2">
                       <button
                         onClick={() => startEditing(entry)}
                         className="text-blue-500 hover:text-blue-700 cursor-pointer"

@@ -1,3 +1,7 @@
+'use client';
+
+import { motion } from 'framer-motion';
+
 interface EmptyStateProps {
   searchTerm: string;
   onAddNew: () => void;
@@ -5,7 +9,12 @@ interface EmptyStateProps {
 
 export default function EmptyState({ searchTerm }: EmptyStateProps) {
   return (
-    <div className="text-center py-12">
+    <motion.div
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3 }}
+      className="text-center py-12"
+    >
       <div className="mx-auto h-24 w-24 text-gray-400">
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -30,6 +39,6 @@ export default function EmptyState({ searchTerm }: EmptyStateProps) {
           ? "Try adjusting your search or filter to find what you're looking for"
           : 'Get started by adding your first password'}
       </p>
-    </div>
+    </motion.div>
   );
 }

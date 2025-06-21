@@ -7,9 +7,13 @@ import { encrypt, decrypt } from '@/lib/crypto';
 export async function POST(req: NextRequest) {
   await connectDB();
   const token = req.cookies.get('token')?.value;
+  if (!token) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    console.log('No token found');
+  }
 
   try {
-    const { userId } = verifyToken(token!);
+    const { userId } = await verifyToken(token!);
     const { website, username, password, note } = await req.json();
     const encryptedPassword = encrypt(password);
 
@@ -34,7 +38,7 @@ export async function GET(req: NextRequest) {
   const token = req.cookies.get('token')?.value;
 
   try {
-    const { userId } = verifyToken(token!);
+    const { userId } = await verifyToken(token!);
     const entries = await PasswordEntry.find({ userId });
 
     const decryptedEntries = entries.map((entry) => ({

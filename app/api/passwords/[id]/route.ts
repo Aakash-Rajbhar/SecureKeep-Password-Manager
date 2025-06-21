@@ -6,7 +6,7 @@ import { encrypt, decrypt } from '@/lib/crypto';
 
 export async function PUT(
   req: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: { id: string } }
 ) {
   await connectDB();
   const token = req.cookies.get('token')?.value;
@@ -16,7 +16,7 @@ export async function PUT(
   }
 
   try {
-    const { userId } = verifyToken(token);
+    const { userId } = await verifyToken(token); // Make sure this is `await`
     const { website, username, password, note } = await req.json();
 
     if (!website || !username || !password) {
@@ -29,7 +29,7 @@ export async function PUT(
     const encryptedPassword = encrypt(password);
 
     const updated = await PasswordEntry.findOneAndUpdate(
-      { _id: (await params).id, userId },
+      { _id: params.id, userId },
       { website, username, password: encryptedPassword, note },
       { new: true }
     );
@@ -39,12 +39,11 @@ export async function PUT(
         { error: 'Password entry not found' },
         { status: 404 }
       );
-    } else if (updated) {
-      console.log('Password entry updated successfully:', updated);
     }
 
     const updatedObj = updated.toObject();
     updatedObj.password = decrypt(updatedObj.password);
+
     return NextResponse.json(updatedObj);
   } catch (error) {
     console.error('Error updating password:', error);
@@ -67,7 +66,7 @@ export async function DELETE(
   }
 
   try {
-    const { userId } = verifyToken(token);
+    const { userId } = await verifyToken(token);
 
     const deleted = await PasswordEntry.findOneAndDelete({
       _id: params.id,
