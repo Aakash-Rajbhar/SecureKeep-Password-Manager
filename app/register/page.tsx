@@ -31,7 +31,7 @@ export default function RegisterPage() {
         <div className="flex flex-col items-center mb-6">
           <UserPlus size={36} className="text-indigo-600 mb-2" />
           <h1 className="text-3xl font-bold text-gray-800">Create Account</h1>
-          <p className="text-sm text-gray-600">Join SecureVault today</p>
+          <p className="text-sm text-gray-600">Join SecureKeep today</p>
         </div>
 
         <form onSubmit={register} className="space-y-4">

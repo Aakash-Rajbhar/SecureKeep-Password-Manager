@@ -26,7 +26,7 @@ const Hero = ({ heroY, opacity }: HeroProps) => {
         >
           Protect Your Digital Life with{' '}
           <span className="bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
-            SecureVault 🔒
+            SecureKeep🔒
           </span>
         </motion.h2>
 
@@ -80,7 +80,7 @@ const Hero = ({ heroY, opacity }: HeroProps) => {
               <div className="w-3 h-3 bg-green-400 rounded-full"></div>
             </div>
             <div className="flex-1 text-center text-sm text-neutral-600">
-              SecureVault Dashboard
+              SecureKeep Dashboard
             </div>
           </div>
           <div className="aspect-video bg-gradient-to-br from-white to-neutral-50 flex items-center justify-center">

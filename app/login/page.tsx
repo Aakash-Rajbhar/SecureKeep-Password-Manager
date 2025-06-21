@@ -36,7 +36,7 @@ export default function LoginPage() {
       <div className="w-full max-w-md p-8 bg-white/30 backdrop-blur-xl border border-white/20 rounded-2xl shadow-2xl">
         <div className="flex flex-col items-center mb-6">
           <ShieldCheck size={36} className="text-indigo-600 mb-2" />
-          <h1 className="text-3xl font-bold text-gray-800">SecureVault</h1>
+          <h1 className="text-3xl font-bold text-gray-800">SecureKeep</h1>
           <p className="text-sm text-gray-600">
             Log in to protect your secrets
           </p>

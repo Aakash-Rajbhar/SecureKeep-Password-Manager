@@ -36,7 +36,7 @@ const FeaturedSection = () => {
         className="text-center mb-16"
       >
         <h3 className="text-4xl md:text-5xl font-bold py-4 mb-6 bg-gradient-to-r from-neutral-900 to-neutral-700 bg-clip-text text-transparent">
-          Why SecureVault?
+          Why SecureKeep?
         </h3>
         <p className="max-w-2xl mx-auto text-neutral-600 text-lg">
           Everything you need to store, manage, and secure your credentials in

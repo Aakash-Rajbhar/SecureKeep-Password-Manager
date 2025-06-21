@@ -10,7 +10,7 @@ const Footer = () => {
         viewport={{ once: true }}
         className="text-center text-neutral-500"
       >
-        © {new Date().getFullYear()} SecureVault. All rights reserved.
+        © {new Date().getFullYear()} SecureKeep. All rights reserved.
       </motion.div>
     </footer>
   );

@@ -22,7 +22,7 @@ export default function Header() {
     >
       <div>
         <h1 className="text-3xl font-bold text-gray-800 bg-clip-text bg-gradient-to-r from-purple-600 to-blue-600">
-          SecureVault
+          SecureKeep
         </h1>
         <p className="text-gray-500 text-sm">Your digital keys, protected</p>
       </div>
