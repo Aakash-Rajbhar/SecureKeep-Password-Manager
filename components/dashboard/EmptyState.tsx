@@ -4,7 +4,6 @@ import { motion } from 'framer-motion';
 
 interface EmptyStateProps {
   searchTerm: string;
-  onAddNew: () => void;
 }
 
 export default function EmptyState({ searchTerm }: EmptyStateProps) {

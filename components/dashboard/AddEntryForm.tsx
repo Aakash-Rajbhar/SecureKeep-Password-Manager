@@ -9,7 +9,6 @@ interface AddEntryFormProps {
     website: string;
     username: string;
     password: string;
-    showPassword: boolean;
   };
   handleFormChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   addPassword: (e: React.FormEvent) => void;
