@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
 import { Home, LogOut } from 'lucide-react';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 
 export default function Header() {
@@ -21,10 +22,19 @@ export default function Header() {
       className="relative flex justify-between items-start sm:items-center mb-8 gap-4 z-10"
     >
       <div>
-        <h1 className="text-3xl font-bold text-gray-800 bg-clip-text bg-gradient-to-r from-purple-600 to-blue-600">
+        {/* <h1 className="text-3xl font-bold text-gray-800 bg-clip-text bg-gradient-to-r from-purple-600 to-blue-600">
           SecureKeep
-        </h1>
-        <p className="text-gray-500 text-sm">Your digital keys, protected</p>
+        </h1> */}
+        <Image
+          src="/text-logo.svg"
+          alt="SecureKeep"
+          width={160}
+          height={90}
+          className="w-44 sm:w-48"
+        />
+        <p className="text-gray-500 text-sm ml-1">
+          Your digital keys, protected
+        </p>
       </div>
 
       <div className="flex items-center gap-3">
@@ -45,7 +55,7 @@ export default function Header() {
           className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white/70 backdrop-blur-sm border border-gray-300 hover:bg-white text-gray-700 transition-all shadow-sm cursor-pointer"
         >
           <LogOut size={20} />
-          <span className="hidden sm:inline">Logout</span>
+          <span className="">Logout</span>
         </motion.button>
       </div>
     </motion.header>

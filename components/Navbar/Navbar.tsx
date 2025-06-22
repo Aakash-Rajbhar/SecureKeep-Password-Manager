@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion';
+import Image from 'next/image';
 
 interface NavbarProps {
   isScrolled: boolean;
@@ -11,7 +12,7 @@ const Navbar: React.FC<NavbarProps> = ({
 }) => {
   return (
     <motion.header
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-100 ${
         isScrolled ? 'bg-white/80 backdrop-blur-md shadow-lg' : 'bg-transparent'
       }`}
       initial={{ y: -100 }}
@@ -20,12 +21,18 @@ const Navbar: React.FC<NavbarProps> = ({
     >
       <div className="max-w-6xl mx-auto flex justify-between items-center px-6 md:px-12 py-5">
         <motion.a
-          href={isAuthenticated ? '/dashboard' : '#hero'}
+          href="#hero"
           className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent"
           whileHover={{ scale: 1.05 }}
           transition={{ type: 'spring', stiffness: 400 }}
         >
-          SecureKeep
+          <Image
+            src="/text-logo.svg"
+            alt="SecureKeep"
+            width={160}
+            height={90}
+            className="inline-block"
+          />
         </motion.a>
 
         <nav className="hidden md:flex items-center gap-8 text-sm font-medium">

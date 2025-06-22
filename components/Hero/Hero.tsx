@@ -36,8 +36,8 @@ const Hero = ({ heroY, opacity }: HeroProps) => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.6 }}
         >
-          A modern password manager that keeps your credentials safe,
-          accessible, and encrypted using military-grade security.
+          A modern password manager that protects your digital life with robust
+          encryption while keeping your credentials easily accessible.
         </motion.p>
 
         <motion.div

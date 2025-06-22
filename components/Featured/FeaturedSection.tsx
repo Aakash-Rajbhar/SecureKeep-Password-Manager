@@ -12,9 +12,9 @@ const FeaturedSection = () => {
     },
     {
       icon: <Search className="w-6 h-6" />,
-      title: 'Search & Auto-Fill',
+      title: 'Search Functionality',
       description:
-        'Quickly find passwords and auto-fill login forms to save time and effort.',
+        'Quickly find passwords and entries with our powerful search functionality, making management effortless.',
       gradient: 'from-purple-500 to-blue-600',
     },
     {
