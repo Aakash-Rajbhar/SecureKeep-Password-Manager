@@ -52,7 +52,7 @@ const Hero = ({ heroY, opacity }: HeroProps) => {
             whileHover={{ scale: 1.05, y: -3 }}
             whileTap={{ scale: 0.95 }}
           >
-            <button>
+            <button className="cursor-pointer">
               Try Now
               <motion.span
                 className="inline-block ml-2"

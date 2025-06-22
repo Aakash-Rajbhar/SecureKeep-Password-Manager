@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { LogOut } from 'lucide-react';
+import { Home, LogOut } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
 export default function Header() {
@@ -11,7 +11,7 @@ export default function Header() {
       credentials: 'include',
     });
 
-    router.push('/login');
+    router.push('/');
   };
   return (
     <motion.header
@@ -28,6 +28,16 @@ export default function Header() {
       </div>
 
       <div className="flex items-center gap-3">
+        <motion.a
+          href="/"
+          whileHover={{ scale: 1.03 }}
+          whileTap={{ scale: 0.98 }}
+          onClick={logout}
+          title="Go to Home"
+          className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white/70 backdrop-blur-sm border border-gray-300 hover:bg-white text-gray-700 transition-all shadow-sm cursor-pointer"
+        >
+          <Home size={20} />
+        </motion.a>
         <motion.button
           whileHover={{ scale: 1.03 }}
           whileTap={{ scale: 0.98 }}

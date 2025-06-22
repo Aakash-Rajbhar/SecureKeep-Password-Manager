@@ -1,7 +1,8 @@
 'use client';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Eye, EyeClosed, ShieldCheck } from 'lucide-react';
+import { Eye, EyeClosed, MoveLeftIcon, ShieldCheck } from 'lucide-react';
+import Link from 'next/link';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -32,7 +33,14 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-100 via-purple-100 to-white px-4">
+    <div className="relative min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-100 via-purple-100 to-white px-4">
+      <Link
+        href={'/'}
+        className="absolute top-4 left-4 flex items-center gap-2 bg-white p-4 rounded-full text-gray-700 hover:text-gray-900 transition-colors"
+        title="Back to home"
+      >
+        <MoveLeftIcon size={20} />
+      </Link>
       <div className="w-full max-w-md p-8 bg-white/30 backdrop-blur-xl border border-white/20 rounded-2xl shadow-2xl">
         <div className="flex flex-col items-center mb-6">
           <ShieldCheck size={36} className="text-indigo-600 mb-2" />
@@ -93,12 +101,12 @@ export default function LoginPage() {
 
           <p className="text-center text-sm text-gray-600 mt-4">
             Don&apos;t have an account?{' '}
-            <a
+            <Link
               href="/register"
               className="text-indigo-500 hover:underline font-medium"
             >
               Register here
-            </a>
+            </Link>
           </p>
         </form>
       </div>
