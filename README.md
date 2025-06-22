@@ -1,36 +1,42 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🔐 Secure Password Manager
 
-## Getting Started
+A modern, full-stack password manager web app built with **Next.js**, **MongoDB**, **Tailwind CSS**, and **JWT authentication**. It allows users to securely save, view, edit, and delete their website credentials with client-triggered decryption, keeping stored passwords encrypted by default.
 
-First, run the development server:
+![SecureKeep Preview](./public/dashboard-preview.png)
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+---
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## ✨ Features
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- 🔐 **Encrypted password storage** using AES-256
+- 👁️ **Toggle password visibility** (client-side decryption on demand)
+- ✏️ **Edit and save passwords** inline
+- ➕ Add new password entries
+- 🔎 Search/filter by website or username
+- 📤 Export all passwords to a CSV file (with decryption warning)
+- 🧾 Modern and responsive UI using Tailwind CSS
+- 🔄 Refresh entries manually
+- 🧠 Session-based JWT auth (token stored in `httpOnly` cookie)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+---
 
-## Learn More
+## 🚀 Tech Stack
 
-To learn more about Next.js, take a look at the following resources:
+| Layer      | Technology                                |
+| ---------- | ----------------------------------------- |
+| Frontend   | React (Next.js App Router) + Tailwind CSS |
+| Backend    | Node.js (API routes via Next.js)          |
+| Auth       | JWT (httpOnly cookie)                     |
+| Database   | MongoDB with Mongoose ORM                 |
+| Encryption | AES-256 via `crypto` module               |
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+---
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 🛡️ Security Highlights
 
-## Deploy on Vercel
+- All passwords are **stored encrypted** in MongoDB.
+- Decryption only happens **on user request** (e.g., clicking the eye icon).
+- JWT is stored as a **secure httpOnly cookie**, preventing XSS access.
+- Only the owner of a password (verified via token) can view/edit/delete it.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+---

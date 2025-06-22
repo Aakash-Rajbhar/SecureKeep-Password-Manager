@@ -48,7 +48,7 @@ const Hero = ({ heroY, opacity }: HeroProps) => {
         >
           <motion.a
             href="/register"
-            className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white px-8 py-4 rounded-full text-lg font-medium shadow-2xl hover:shadow-purple-500/25 transition-all duration-300"
+            className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white px-6 sm:px-8 py-4 rounded-full text-lg font-medium shadow-2xl hover:shadow-purple-500/25 transition-all duration-300"
             whileHover={{ scale: 1.05, y: -3 }}
             whileTap={{ scale: 0.95 }}
           >
@@ -89,7 +89,7 @@ const Hero = ({ heroY, opacity }: HeroProps) => {
               alt="dashboard preview"
               width={1200}
               height={800}
-              className="rounded-b-2xl object-cover"
+              className="rounded-b-2xl aspect-[16/9] object-cover"
             />
           </div>
         </motion.div>
