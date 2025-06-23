@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion';
+// import { u } from 'framer-motion/client';
 import { Home, LogOut } from 'lucide-react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';

@@ -25,6 +25,8 @@ export default function LandingPage() {
       try {
         const user = await fetch('/api/me');
         if (user.ok) {
+          const userData = await user.json();
+          console.log('User data:', userData);
           setIsAuthenticated(true);
           setIsLoading(false);
         } else {

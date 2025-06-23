@@ -76,13 +76,14 @@ const Navbar: React.FC<NavbarProps> = ({
               >
                 Login
               </motion.a>
-              <motion.button
+              <motion.a
+                href="/register"
                 className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white px-6 py-2 rounded-full text-sm font-medium transition-all duration-300 shadow-lg hover:shadow-purple-500/25 cursor-pointer"
                 whileHover={{ scale: 1.05, y: -2 }}
                 whileTap={{ scale: 0.95 }}
               >
                 Get Started
-              </motion.button>
+              </motion.a>
             </>
           )}
         </div>
