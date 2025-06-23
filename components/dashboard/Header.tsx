@@ -43,7 +43,6 @@ export default function Header() {
           href="/"
           whileHover={{ scale: 1.03 }}
           whileTap={{ scale: 0.98 }}
-          onClick={logout}
           title="Go to Home"
           className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white/70 backdrop-blur-sm border border-gray-300 hover:bg-white text-gray-700 transition-all shadow-sm cursor-pointer"
         >
@@ -56,7 +55,7 @@ export default function Header() {
           className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white/70 backdrop-blur-sm border border-gray-300 hover:bg-white text-gray-700 transition-all shadow-sm cursor-pointer"
         >
           <LogOut size={20} />
-          <span className="">Logout</span>
+          <span className="text-sm sm:text-md">Logout</span>
         </motion.button>
       </div>
     </motion.header>
